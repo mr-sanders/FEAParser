@@ -8,6 +8,9 @@ rdir('Records', function(err, files){
 			return path.basename(file) == 'GetFEAData.txt' ? 1 : 0;
 		})
 		.forEach(function(file){
+
+			console.log('reading file - ' + file); //Console read step
+			
 			fs.readFile(file, function(e, data){
 				var buf = data.toString();
 
@@ -49,32 +52,36 @@ rdir('Records', function(err, files){
 						};
 					});
 				});
-				console.log(path.dirname(file));
 				/*----------  Write output files  ----------*/
 				
-				// if (!fs.existsSync('Output')){
-				//   fs.mkdirSync('Output');
-				// }
-				// var wstream = fs.createWriteStream('Output/'+ path.dirname(file) +'.csv');
+				if (!fs.existsSync('Output')){
+				  fs.mkdirSync('Output');
+				}
+				var outfilename = path.dirname(file).match(/\\.+/g).toString().replace('\\', '') + '.csv';
+				var wstream = fs.createWriteStream('Output/'+ outfilename);
 
-				// var zkeys = Object.keys(jsonData);
-				// zkeys.forEach(function(item1, i1, arr1) {
-				// 	var keys = Object.keys(jsonData[item1]);
-				// 	wstream.write('"' + item1.toString().replace('.',',') + '"\r\n');
-				// 	keys.forEach(function(item2, i2, arr2) {
-				// 		wstream.write('"' + item2 + '",');
-				// 	});
-				// 	wstream.write('\r\n');
 
-				// 	for (var i = 0; i <= jsonData[item1][keys[0]].length - 1; i++) {
-				// 		keys.forEach(function(item2, i2, arr2) {
-				// 			wstream.write('"=' + jsonData[item1][item2][i] + '",');
-				// 		});
-				// 		wstream.write('\r\n');
-				// 	};
-				// 	wstream.write('\r\n');
-				// });
-				// wstream.end();
+				console.log('writing file - Output/' + outfilename); //Console write step
+
+
+				var zkeys = Object.keys(jsonData);
+				zkeys.forEach(function(item1, i1, arr1) {
+					var keys = Object.keys(jsonData[item1]);
+					wstream.write('"' + item1.toString().replace('.',',') + '"\r\n');
+					keys.forEach(function(item2, i2, arr2) {
+						wstream.write('"' + item2 + '",');
+					});
+					wstream.write('\r\n');
+
+					for (var i = 0; i <= jsonData[item1][keys[0]].length - 1; i++) {
+						keys.forEach(function(item2, i2, arr2) {
+							wstream.write('"=' + jsonData[item1][item2][i] + '",');
+						});
+						wstream.write('\r\n');
+					};
+					wstream.write('\r\n');
+				});
+				wstream.end();
 
 				/*=====  End of Get planes  ======*/
 
