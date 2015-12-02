@@ -96,34 +96,39 @@ rdir('Records', function(err, files){
 				=            Out z-stresses only            =
 				====================================*/
 
-				// if (!fs.existsSync('Stresses')){
-				//   fs.mkdirSync('Stresses');
-				// }
-				// var outfilename = path.dirname(file).match(/\\.+/g).toString().replace(/_.+abs/, '').replace('\\', 'Szz__') + '.prn';
-				// var wstream = fs.createWriteStream('Stresses/'+ outfilename);
-				// console.log('writing stresses file - Output/' + outfilename);
-				// var lengths = [];
-				// zkeys.forEach(function(item1, i1, arr1) {
-				// 	lengths.push(jsonData[item1]['Szz'].length);
-				// });
-				// var mainlength = Math.min.apply(Math, lengths);
-				// zkeys.forEach(function(item1, i1, arr1) {
-				// 	for(var i = 0; i < mainlength; i++) {
-				// 		wstream.write(jsonData[item1]['Szz'][i] + ' ');
-				// 	}
-				// 	wstream.write('\r\n');
-				// });
+				if (!fs.existsSync('Stresses')){
+				  fs.mkdirSync('Stresses');
+				}
+				var outfilename = path.dirname(file).match(/\\.+/g).toString().replace(/_.+abs/, '').replace('\\', 'Szz__') + '.prn';
+				var wstream = fs.createWriteStream('Stresses/'+ outfilename);
+				console.log('writing stresses file - Output/' + outfilename);
+				var lengths = [];
+				zkeys.forEach(function(item1, i1, arr1) {
+					lengths.push(jsonData[item1]['Szz'].length);
+				});
+				var mainlength = Math.min.apply(Math, lengths);
+				zkeys.forEach(function(item1, i1, arr1) {
+					for(var i = 0; i < mainlength; i++) {
+						wstream.write(jsonData[item1]['Szz'][i] + ' ');
+					}
+					wstream.write('\r\n');
+				});
 				
-				// wstream.end();
+				wstream.end();
 
 				/*=====  End of Out z-stresses only  ======*/
 
 				/*==================================
 				=            Pump Light            =
 				==================================*/
-				
-				console.log(jsonData);
-				
+				var outfilename = path.dirname(file).match(/\\.+/g).toString().replace(/_.+abs/, '').replace('\\', 'Pump__') + '.prn';
+				var wstream = fs.createWriteStream('Stresses/'+ outfilename);
+				console.log('writing stresses file - Output/' + outfilename);
+				var nullindex = jsonData['0']['x'].indexOf(-2.22045e-16);
+				zkeys.forEach(function(item1, i1, arr1) {
+					wstream.write(item1 + ' ' + jsonData[item1]['Pump Light'][nullindex] + '\r\n');
+				});
+				wstream.end();
 				/*=====  End of Pump Light  ======*/
 				
 			});
