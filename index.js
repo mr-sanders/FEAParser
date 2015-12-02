@@ -15,7 +15,7 @@ rdir('Records', function(err, files){
 				var buf = data.toString();
 
 				/*==================================
-				=            Get planes            =
+				=            Get Data            =
 				==================================*/
 				
 				var planes = buf.split(/Profiles.*/);
@@ -48,44 +48,84 @@ rdir('Records', function(err, files){
 						var values = vals.split(/\s+/g);
 						for (var j = 0; j <= values.length - 1; j++) {
 							if(!jsonData[zkey][arrkeys[j]]) jsonData[zkey][arrkeys[j]] = [];
-							jsonData[zkey][arrkeys[j]][i] = Number(values[j]).toString().replace('.', ',');
+							jsonData[zkey][arrkeys[j]][i] = Number(values[j]); //for excel .toString().replace('.', ',')
 						};
 					});
 				});
-				/*----------  Write output files  ----------*/
+				/*=====  End of Get Data  ======*/
 				
+				/*----------  Write output files  ----------*/
+
 				if (!fs.existsSync('Output')){
 				  fs.mkdirSync('Output');
 				}
-				var outfilename = path.dirname(file).match(/\\.+/g).toString().replace('\\', '') + '.csv';
-				var wstream = fs.createWriteStream('Output/'+ outfilename);
+				// var outfilename = path.dirname(file).match(/\\.+/g).toString().replace('\\', '') + '.csv';
+				// var wstream = fs.createWriteStream('Output/'+ outfilename);
 
 
-				console.log('writing file - Output/' + outfilename); //Console write step
+				// console.log('writing file - Output/' + outfilename); //Console write step
 
 
 				var zkeys = Object.keys(jsonData);
-				zkeys.forEach(function(item1, i1, arr1) {
-					var keys = Object.keys(jsonData[item1]);
-					wstream.write('"' + item1.toString().replace('.',',') + '"\r\n');
-					keys.forEach(function(item2, i2, arr2) {
-						wstream.write('"' + item2 + '",');
-					});
-					wstream.write('\r\n');
 
-					for (var i = 0; i <= jsonData[item1][keys[0]].length - 1; i++) {
-						keys.forEach(function(item2, i2, arr2) {
-							wstream.write('"=' + jsonData[item1][item2][i] + '",');
-						});
-						wstream.write('\r\n');
-					};
-					wstream.write('\r\n');
-				});
-				wstream.end();
+				/*===============================================
+				=            All table values output            =
+				===============================================*/
+				
+				// zkeys.forEach(function(item1, i1, arr1) {
+				// 	var keys = Object.keys(jsonData[item1]);
+				// 	wstream.write('"' + item1.toString().replace('.',',') + '"\r\n');
+				// 	keys.forEach(function(item2, i2, arr2) {
+				// 		wstream.write('"' + item2 + '",');
+				// 	});
+				// 	wstream.write('\r\n');
 
-				/*=====  End of Get planes  ======*/
+				// 	for (var i = 0; i <= jsonData[item1][keys[0]].length - 1; i++) {
+				// 		keys.forEach(function(item2, i2, arr2) {
+				// 			wstream.write('"=' + jsonData[item1][item2][i] + '",');
+				// 		});
+				// 		wstream.write('\r\n');
+				// 	};
+				// 	wstream.write('\r\n');
+				// });
+				// wstream.end();
+				
+				/*=====  End of All table values output  ======*/
 
+				/*====================================
+				=            Out z-stresses only            =
+				====================================*/
 
+				// if (!fs.existsSync('Stresses')){
+				//   fs.mkdirSync('Stresses');
+				// }
+				// var outfilename = path.dirname(file).match(/\\.+/g).toString().replace(/_.+abs/, '').replace('\\', 'Szz__') + '.prn';
+				// var wstream = fs.createWriteStream('Stresses/'+ outfilename);
+				// console.log('writing stresses file - Output/' + outfilename);
+				// var lengths = [];
+				// zkeys.forEach(function(item1, i1, arr1) {
+				// 	lengths.push(jsonData[item1]['Szz'].length);
+				// });
+				// var mainlength = Math.min.apply(Math, lengths);
+				// zkeys.forEach(function(item1, i1, arr1) {
+				// 	for(var i = 0; i < mainlength; i++) {
+				// 		wstream.write(jsonData[item1]['Szz'][i] + ' ');
+				// 	}
+				// 	wstream.write('\r\n');
+				// });
+				
+				// wstream.end();
+
+				/*=====  End of Out z-stresses only  ======*/
+
+				/*==================================
+				=            Pump Light            =
+				==================================*/
+				
+				console.log(jsonData);
+				
+				/*=====  End of Pump Light  ======*/
+				
 			});
 		});
 });
