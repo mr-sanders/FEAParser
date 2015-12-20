@@ -3,136 +3,148 @@ var path = require('path');
 var rdir = require('recursive-readdir');
 
 rdir('Records', function(err, files){
-	// files
-	// 	.filter(function(file) {
-	// 		return path.basename(file) == 'GetFEAData.txt' ? 1 : 0;
-	// 	})
-	// 	.forEach(function(file){
+	files
+		.filter(function(file) {
+			return path.basename(file) == 'GetFEAData.txt' ? 1 : 0;
+		})
+		.forEach(function(file){
 
-	// 		console.log('reading file - ' + file); //Console read step
+			console.log('reading file - ' + file); //Console read step
 			
-	// 		fs.readFile(file, function(e, data){
-	// 			var buf = data.toString();
+			fs.readFile(file, function(e, data){
+				var buf = data.toString();
 
-	// 			/*==================================
-	// 			=            Get Data            =
-	// 			==================================*/
+				/*==================================
+				=            Get Data            =
+				==================================*/
 				
-	// 			var planes = buf.split(/Profiles.*/);
-	// 			planes.shift();
-	// 			planes[0] = planes[0].replace(/^[\r\n]/gm, "");
+				var planes = buf.split(/Profiles.*/);
+				planes.shift();
+				planes[0] = planes[0].replace(/^[\r\n]/gm, "");
 				
-	// 			var xz = planes[0].split(/^\s/gm);
-	// 			xz.shift();
+				var xz = planes[0].split(/^\s/gm);
+				xz.shift();
 
-	// 			var jsonData = {};
+				var jsonData = {};
 
-	// 			xz.forEach(function(dataLine, lineIndex, dataArr) {
-	// 				var temp = dataLine.split(/[\r\n]/gm);
+				xz.forEach(function(dataLine, lineIndex, dataArr) {
+					var temp = dataLine.split(/[\r\n]/gm);
 
-	// 				/*----------  get z values  ----------*/
+					/*----------  get z values  ----------*/
 					
-	// 				var zkey = temp.shift().match(/(z\s=\s+)\d+,*\d*/g)[0].replace(/z\s=\s+/, "").replace(',', '.');
+					var zkey = temp.shift().match(/(z\s=\s+)\d+,*\d*/g)[0].replace(/z\s=\s+/, "").replace(',', '.');
 
-	// 				/*----------  get keys for array  ----------*/
+					/*----------  get keys for array  ----------*/
 
-	// 				var arrkeys = temp.shift().match(/(\w(?=\s)|\w+(\s?\w+|-\w+))/g);
+					var arrkeys = temp.shift().match(/(\w(?=\s)|\w+(\s?\w+|-\w+))/g);
 
-	// 				jsonData[zkey] = {};
+					jsonData[zkey] = {};
 
-	// 				/*----------  get values  ----------*/
+					/*----------  get values  ----------*/
 
-	// 				temp.pop();
+					temp.pop();
 					
-	// 				temp.forEach(function(vals, i, arr) {
-	// 					var values = vals.split(/\s+/g);
-	// 					for (var j = 0; j <= values.length - 1; j++) {
-	// 						if(!jsonData[zkey][arrkeys[j]]) jsonData[zkey][arrkeys[j]] = [];
-	// 						jsonData[zkey][arrkeys[j]][i] = Number(values[j]); //for excel .toString().replace('.', ',')
-	// 					};
-	// 				});
-	// 			});
-	// 			/*=====  End of Get Data  ======*/
+					temp.forEach(function(vals, i, arr) {
+						var values = vals.split(/\s+/g);
+						for (var j = 0; j <= values.length - 1; j++) {
+							if(!jsonData[zkey][arrkeys[j]]) jsonData[zkey][arrkeys[j]] = [];
+							jsonData[zkey][arrkeys[j]][i] = Number(values[j]); //for excel .toString().replace('.', ',')
+						};
+					});
+				});
+				/*=====  End of Get Data  ======*/
 				
-	// 			/*----------  Write output files  ----------*/
+				/*----------  Write output files  ----------*/
 
-	// 			if (!fs.existsSync('Output')){
-	// 			  fs.mkdirSync('Output');
-	// 			}
-	// 			// var outfilename = path.dirname(file).match(/\\.+/g).toString().replace('\\', '') + '.csv';
-	// 			// var wstream = fs.createWriteStream('Output/'+ outfilename);
-
-
-	// 			// console.log('writing file - Output/' + outfilename); //Console write step
+				if (!fs.existsSync('Output')){
+				  fs.mkdirSync('Output');
+				}
+				// var outfilename = path.dirname(file).match(/\\.+/g).toString().replace('\\', '') + '.csv';
+				// var wstream = fs.createWriteStream('Output/'+ outfilename);
 
 
-	// 			var zkeys = Object.keys(jsonData);
+				// console.log('writing file - Output/' + outfilename); //Console write step
 
-	// 			/*===============================================
-	// 			=            All table values output            =
-	// 			===============================================*/
+
+				var zkeys = Object.keys(jsonData);
+
+				/*===============================================
+				=            All table values output            =
+				===============================================*/
 				
-	// 			// zkeys.forEach(function(item1, i1, arr1) {
-	// 			// 	var keys = Object.keys(jsonData[item1]);
-	// 			// 	wstream.write('"' + item1.toString().replace('.',',') + '"\r\n');
-	// 			// 	keys.forEach(function(item2, i2, arr2) {
-	// 			// 		wstream.write('"' + item2 + '",');
-	// 			// 	});
-	// 			// 	wstream.write('\r\n');
+				// zkeys.forEach(function(item1, i1, arr1) {
+				// 	var keys = Object.keys(jsonData[item1]);
+				// 	wstream.write('"' + item1.toString().replace('.',',') + '"\r\n');
+				// 	keys.forEach(function(item2, i2, arr2) {
+				// 		wstream.write('"' + item2 + '",');
+				// 	});
+				// 	wstream.write('\r\n');
 
-	// 			// 	for (var i = 0; i <= jsonData[item1][keys[0]].length - 1; i++) {
-	// 			// 		keys.forEach(function(item2, i2, arr2) {
-	// 			// 			wstream.write('"=' + jsonData[item1][item2][i] + '",');
-	// 			// 		});
-	// 			// 		wstream.write('\r\n');
-	// 			// 	};
-	// 			// 	wstream.write('\r\n');
-	// 			// });
-	// 			// wstream.end();
+				// 	for (var i = 0; i <= jsonData[item1][keys[0]].length - 1; i++) {
+				// 		keys.forEach(function(item2, i2, arr2) {
+				// 			wstream.write('"=' + jsonData[item1][item2][i] + '",');
+				// 		});
+				// 		wstream.write('\r\n');
+				// 	};
+				// 	wstream.write('\r\n');
+				// });
+				// wstream.end();
 				
-	// 			/*=====  End of All table values output  ======*/
+				/*=====  End of All table values output  ======*/
 
-	// 			/*====================================
-	// 			=            Out z-stresses only            =
-	// 			====================================*/
+				/*====================================
+				=            Out z-stresses only            =
+				====================================*/
 
-	// 			if (!fs.existsSync('Stresses')){
-	// 			  fs.mkdirSync('Stresses');
-	// 			}
-	// 			var outfilename = path.dirname(file).match(/\\.+/g).toString().replace(/_.+abs/, '').replace('\\', 'Szz__') + '.prn';
-	// 			var wstream = fs.createWriteStream('Stresses/'+ outfilename);
-	// 			console.log('writing stresses file - Output/' + outfilename);
-	// 			var lengths = [];
-	// 			zkeys.forEach(function(item1, i1, arr1) {
-	// 				lengths.push(jsonData[item1]['Szz'].length);
-	// 			});
-	// 			var mainlength = Math.min.apply(Math, lengths);
-	// 			zkeys.forEach(function(item1, i1, arr1) {
-	// 				for(var i = 0; i < mainlength; i++) {
-	// 					wstream.write(jsonData[item1]['Szz'][i] + ' ');
-	// 				}
-	// 				wstream.write('\r\n');
-	// 			});
+				if (!fs.existsSync('Output/Stresses')){
+				  fs.mkdirSync('Output/Stresses');
+				}
+				if (!fs.existsSync('Output/Temp')){
+				  fs.mkdirSync('Output/Temp');
+				}
+				var outfilename1 = path.dirname(file).match(/\\.+/g).toString().replace(/_.+abs/, '').replace('\\', 'Szz__') + '.prn';
+				var outfilename2 = path.dirname(file).match(/\\.+/g).toString().replace(/_.+abs/, '').replace('\\', 'Temp__') + '.prn';
+				var ws_stress = fs.createWriteStream('Output/Stresses/'+ outfilename1);
+				var ws_temp = fs.createWriteStream('Output/Temp/'+ outfilename2);
+				console.log('writing stresses file - Output/Stresses/' + outfilename1);
+				console.log('writing stresses file - Output/Temp/' + outfilename2);
+				var lengths = [];
+				zkeys.forEach(function(item1, i1, arr1) {
+					lengths.push(jsonData[item1]['Szz'].length);
+				});
+				var mainlength = Math.min.apply(Math, lengths);
+				zkeys.forEach(function(item1, i1, arr1) {
+					for(var i = 0; i < mainlength; i++) {
+						ws_stress.write(jsonData[item1]['Szz'][i] + ' ');
+						ws_temp.write(jsonData[item1]['Temp'][i] + ' ');
+					}
+					ws_stress.write('\r\n');
+					ws_temp.write('\r\n');
+				});
 				
-	// 			wstream.end();
+				ws_stress.end();
+				ws_temp.end();
 
-	// 			/*=====  End of Out z-stresses only  ======*/
+				/*=====  End of Out z-stresses only  ======*/
 
-	// 			/*==================================
-	// 			=            Pump Light            =
-	// 			==================================*/
-	// 			var outfilename = path.dirname(file).match(/\\.+/g).toString().replace(/_.+abs/, '').replace('\\', 'Pump__') + '.prn';
-	// 			var wstream = fs.createWriteStream('Stresses/'+ outfilename);
-	// 			console.log('writing stresses file - Output/' + outfilename);
-	// 			var nullindex = jsonData['0']['x'].indexOf(-2.22045e-16);
-	// 			zkeys.forEach(function(item1, i1, arr1) {
-	// 				wstream.write(item1 + ' ' + jsonData[item1]['Pump Light'][nullindex] + '\r\n');
-	// 			});
-	// 			wstream.end();
-	// 			/*=====  End of Pump Light  ======*/
+				/*==================================
+				=            Pump Light            =
+				==================================*/
+				if (!fs.existsSync('Output/Pump_max')){
+				  fs.mkdirSync('Output/Pump_max');
+				}
+				var outfilename = path.dirname(file).match(/\\.+/g).toString().replace(/_.+abs/, '').replace('\\', 'Pump__') + '.prn';
+				var ws_pump_max = fs.createWriteStream('Output/Pump_max/'+ outfilename);
+				console.log('writing stresses file - Output/Pump_max/' + outfilename);
+				var nullindex = jsonData['0']['x'].indexOf(-2.22045e-16);
+				zkeys.forEach(function(item1, i1, arr1) {
+					ws_pump_max.write(item1 + ' ' + jsonData[item1]['Pump Light'][nullindex] + '\r\n');
+				});
+				ws_pump_max.end();
+				/*=====  End of Pump Light  ======*/
 				
-	// 		});
-	// 	});
+			});
+		});
 
 	var pabs = {};
 	files
@@ -159,10 +171,10 @@ rdir('Records', function(err, files){
 					break;
 			}
 		});
-	if (!fs.existsSync('Output')){
-	  fs.mkdirSync('Output');
+	if (!fs.existsSync('Output/Pump_absorbed')){
+	  fs.mkdirSync('Output/Pump_absorbed');
 	}
-	var outfilename = 'Output/pabs.prn';
+	var outfilename = 'Output/Pump_absorbed/pabs.prn';
 	var wstream = fs.createWriteStream(outfilename);
 	console.log('writing ' + outfilename);
 	Object.keys(pabs).forEach(function(item, i){
