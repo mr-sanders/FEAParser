@@ -102,12 +102,18 @@ rdir('Records', function(err, files){
 				if (!fs.existsSync('Output/Temp')){
 				  fs.mkdirSync('Output/Temp');
 				}
+				if (!fs.existsSync('Output/Pump')){
+				  fs.mkdirSync('Output/Pump');
+				}
 				var outfilename1 = path.dirname(file).match(/\\.+/g).toString().replace(/_.+abs/, '').replace('\\', 'Szz__') + '.prn';
 				var outfilename2 = path.dirname(file).match(/\\.+/g).toString().replace(/_.+abs/, '').replace('\\', 'Temp__') + '.prn';
+				var outfilename3 = path.dirname(file).match(/\\.+/g).toString().replace(/_.+abs/, '').replace('\\', 'Pump__') + '.prn';
 				var ws_stress = fs.createWriteStream('Output/Stresses/'+ outfilename1);
 				var ws_temp = fs.createWriteStream('Output/Temp/'+ outfilename2);
+				var ws_pump = fs.createWriteStream('Output/Pump/'+ outfilename3);
 				console.log('writing stresses file - Output/Stresses/' + outfilename1);
 				console.log('writing stresses file - Output/Temp/' + outfilename2);
+				console.log('writing stresses file - Output/Pump/' + outfilename3);
 				var lengths = [];
 				zkeys.forEach(function(item1, i1, arr1) {
 					lengths.push(jsonData[item1]['Szz'].length);
@@ -117,13 +123,16 @@ rdir('Records', function(err, files){
 					for(var i = 0; i < mainlength; i++) {
 						ws_stress.write(jsonData[item1]['Szz'][i] + ' ');
 						ws_temp.write(jsonData[item1]['Temp'][i] + ' ');
+						ws_pump.write(jsonData[item1]['Pump Light'][i] + ' ');
 					}
 					ws_stress.write('\r\n');
 					ws_temp.write('\r\n');
+					ws_pump.write('\r\n');
 				});
 				
 				ws_stress.end();
 				ws_temp.end();
+				ws_pump.end();
 
 				/*=====  End of Out z-stresses only  ======*/
 
