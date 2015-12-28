@@ -155,6 +155,57 @@ rdir('Records', function(err, files){
 			});
 		});
 
+
+	files
+		.filter(function (file) {
+			return path.basename(file) == 'FitFEAData.txt' ? 1 : 0;
+		})
+		.forEach(function(file){
+			fs.readFile(file, function(e, data){
+				var buf = data.toString();
+				var blocks = buf.split(/(?=\s1\s+z\s=\s+0)/);
+				blocks.shift();
+				var block = blocks[0].split(/^\r\n/m);
+				block.pop();
+				var dataFit = {};
+				
+				block.forEach(function (item, i, arr) {
+					var lines = item.split(/\r\n/m);
+					var z = lines.shift().match(/z\s=\s+\d+,*\d*/g).toString().replace(',','.').replace(/z\s=\s+/,'');
+
+					dataFit[z] = {};
+
+					lines.shift();
+					lines.pop();
+					lines.pop();
+					lines.forEach(function (item, i, arr) {
+						var x = Number(item.match(/^-*\d+\.\d*(E-)*\d*/g));
+						var n = Number(item.match(/\s-*\d+\.\d*(E-)*\d*(?=\s+)/g).toString().replace('\s',''));
+						dataFit[z][x] = n;
+					});
+				});
+				
+				if (!fs.existsSync('Output/RefIndex')){
+				  fs.mkdirSync('Output/RefIndex');
+				}
+				var outfilename = path.dirname(file).match(/\\.+/g).toString().replace(/_.+abs/, '').replace('\\', 'n__') + '.prn';
+				var nstream = fs.createWriteStream('Output/RefIndex/' + outfilename);
+				console.log('writing refIndex file - Output/RefIndex/' + outfilename);
+				var zkeys = Object.keys(dataFit);
+				
+				zkeys.forEach(function(z){
+					var xkeys = Object.keys(dataFit[z]);
+					xkeys.forEach(function(x){
+						nstream.write(dataFit[z][x] + ' ');
+					});
+					nstream.write('\r\n');
+				});
+				nstream.end();
+			});
+		});
+
+
+
 	var pabs = {};
 	files
 		.filter(function (file) {
@@ -193,4 +244,5 @@ rdir('Records', function(err, files){
 		});
 		wstream.write('\r\n');
 	});
+	wstream.end;
 });
