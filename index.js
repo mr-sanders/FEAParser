@@ -188,19 +188,28 @@ rdir('Records', function(err, files){
 				if (!fs.existsSync('Output/RefIndex')){
 				  fs.mkdirSync('Output/RefIndex');
 				}
-				var outfilename = path.dirname(file).match(/\\.+/g).toString().replace(/_.+abs/, '').replace('\\', 'n__') + '.prn';
-				var nstream = fs.createWriteStream('Output/RefIndex/' + outfilename);
-				console.log('writing refIndex file - Output/RefIndex/' + outfilename);
+				var noutfilename = path.dirname(file).match(/\\.+/g).toString().replace(/_.+abs/, '').replace('\\', 'n__') + '.prn';
+				var xoutfilename = path.dirname(file).match(/\\.+/g).toString().replace(/_.+abs/, '').replace('\\', 'x__') + '.prn';
+				var nstream = fs.createWriteStream('Output/RefIndex/' + noutfilename);
+				console.log('writing refIndex file - Output/RefIndex/' + noutfilename);
+				var xstream = fs.createWriteStream('Output/RefIndex/' + xoutfilename);
+				console.log('writing refIndex file - Output/RefIndex/' + xoutfilename);
 				var zkeys = Object.keys(dataFit);
 				
+				var first = true;
 				zkeys.forEach(function(z){
 					var xkeys = Object.keys(dataFit[z]);
 					xkeys.forEach(function(x){
+						if(first) {
+							xstream.write(x + ' ');
+						}
 						nstream.write(dataFit[z][x] + ' ');
 					});
+					first = false;
 					nstream.write('\r\n');
 				});
 				nstream.end();
+				xstream.end();
 			});
 		});
 
