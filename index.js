@@ -196,22 +196,27 @@ rdir('Records', function(err, files){
 				console.log('writing refIndex file - Output/RefIndex/' + xoutfilename);
 				var zkeys = Object.keys(dataFit);
 				
-				var first = true;
+				var xready = false;
+				var recx = false;
 				var nlengths = [];
 				zkeys.forEach(function(item1, i1, arr1) {
 					nlengths.push(Object.keys(dataFit[item1]).length);
 				});
-				var nlength = Math.min.apply(Math, nlengths); //Fixed quantity of x by min for refIndex
+				var nlength = Math.max.apply(Math, nlengths); //Fixed quantity of x by max for refIndex
 
 				zkeys.forEach(function(z){
 					var xkeys = Object.keys(dataFit[z]);
 					for (var i = 0; i < nlength; i++) {
-						if(first) {
+						if(xkeys.length == nlength && !xready) {
 							xstream.write(xkeys[i] + ' ');
+							recx = true;
 						}
-						nstream.write(dataFit[z][xkeys[i]] + ' ');
+						var item = (typeof dataFit[z][xkeys[i]] === 'undefined') ? 0 : dataFit[z][xkeys[i]];
+						nstream.write(item + ' ');
 					};
-					first = false;
+					if (recx) {
+						xready = true;
+					}
 					nstream.write('\r\n');
 				});
 				nstream.end();
