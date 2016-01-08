@@ -197,14 +197,20 @@ rdir('Records', function(err, files){
 				var zkeys = Object.keys(dataFit);
 				
 				var first = true;
+				var nlengths = [];
+				zkeys.forEach(function(item1, i1, arr1) {
+					nlengths.push(Object.keys(dataFit[item1]).length);
+				});
+				var nlength = Math.min.apply(Math, nlengths); //Fixed quantity of x by min for refIndex
+
 				zkeys.forEach(function(z){
 					var xkeys = Object.keys(dataFit[z]);
-					xkeys.forEach(function(x){
+					for (var i = 0; i < nlength; i++) {
 						if(first) {
-							xstream.write(x + ' ');
+							xstream.write(xkeys[i] + ' ');
 						}
-						nstream.write(dataFit[z][x] + ' ');
-					});
+						nstream.write(dataFit[z][xkeys[i]] + ' ');
+					};
 					first = false;
 					nstream.write('\r\n');
 				});
